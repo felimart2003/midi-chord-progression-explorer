@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chordfolio — chord progression explorer</title>
+  <meta name="description" content="Explore keys, build chord progressions, hear them looped, and export MIDI straight into your DAW. No signup.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Chord<span class="accent">folio</span><span class="tagline">progression explorer · MIDI out</span></h1>
+      </div>
+      <button id="btn-theme" title="Toggle light/dark">☀</button>
+    </header>
+
+    <section class="key-bar" aria-label="Key selector">
+      <div class="tonic-row" id="tonics"></div>
+      <select id="mode-select" aria-label="Mode"></select>
+      <span id="key-name"></span>
+    </section>
+
+    <div class="section-title">Diatonic chords <span class="spacer"></span> click to play &amp; add</div>
+    <section class="card-row" id="chords" aria-label="Diatonic chords"></section>
+
+    <div class="section-title">
+      Suggest next chord
+      <span id="suggest-hint"></span>
+      <span class="spacer"></span>
+      <label class="toggle"><input type="checkbox" id="adventurous"> adventurous mode</label>
+    </div>
+    <section class="card-row" id="suggestions" aria-label="Suggested next chords"></section>
+
+    <div class="section-title">Fretboard</div>
+    <div class="instrument" id="fretboard"></div>
+
+    <div class="section-title">Keyboard</div>
+    <div class="instrument" id="piano"></div>
+
+    <footer class="credits">
+      Built with the Web Audio API — no accounts, no tracking. Space bar toggles playback.
+    </footer>
+  </div>
+
+  <div class="timeline-bar">
+    <div class="timeline-inner">
+      <div id="timeline" aria-label="Progression timeline"></div>
+      <div class="transport">
+        <button id="btn-play" disabled>▶ Play</button>
+        <label class="bpm-field">BPM <input type="number" id="bpm" min="40" max="220" step="1"></label>
+        <label class="toggle"><input type="checkbox" id="metronome"> click</label>
+        <button id="btn-export" disabled>Export MIDI</button>
+        <button id="btn-clear" disabled>Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/theory.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/suggest.js"></script>
+  <script src="js/midi.js"></script>
+  <script src="js/piano.js"></script>
+  <script src="js/fretboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>instrument render test</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>body { padding-bottom: 0; }</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="section-title">Fretboard</div>
+    <div class="instrument" id="fretboard"></div>
+    <div class="section-title">Keyboard</div>
+    <div class="instrument" id="piano"></div>
+    <pre id="status">pending</pre>
+  </div>
+  <script src="../js/theory.js"></script>
+  <script src="../js/piano.js"></script>
+  <script src="../js/fretboard.js"></script>
+  <script>
+    try {
+      const p = Piano.create(document.getElementById('piano'), () => {});
+      const f = Fretboard.create(document.getElementById('fretboard'));
+      const key = Theory.getKey(0, 'major');
+      const chord = Theory.diatonicChords(key)[4]; // G major
+      p.pulse(chord.midi);
+      f.pulse(chord.pcs, chord.rootPc);
+      document.getElementById('status').textContent =
+        'ok: highlighted ' + chord.symbol + ' — keys lit: ' +
+        document.querySelectorAll('.pk-white.lit, .pk-black.lit').length +
+        ', fret dots: ' +
+        Array.from(document.querySelectorAll('.fb-dot')).filter(d => d.style.display !== 'none').length;
+    } catch (e) {
+      document.getElementById('status').textContent = 'ERROR: ' + e.message;
+    }
+  </script>
+</body>
+</html>

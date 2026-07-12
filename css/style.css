@@ -1,0 +1,312 @@
+/* Chordfolio — editorial line-art UI. One accent color; dark default. */
+:root {
+  --accent: #ff6b4a;
+  --accent-soft: rgba(255, 107, 74, 0.18);
+}
+:root[data-theme='dark'] {
+  --bg: #101014;
+  --panel: #17171d;
+  --line: #2b2b34;
+  --line-strong: #45454f;
+  --ink: #ecebe7;
+  --ink-dim: #8b8b96;
+  --key-white: #101014;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+:root[data-theme='light'] {
+  --bg: #faf9f6;
+  --panel: #ffffff;
+  --line: #dcdad4;
+  --line-strong: #b4b2ab;
+  --ink: #1c1c20;
+  --ink-dim: #77767e;
+  --key-white: #faf9f6;
+  --shadow: rgba(30, 30, 40, 0.12);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  padding-bottom: 130px; /* room for the sticky timeline */
+}
+
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- header ---------- */
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 26px 0 10px;
+  border-bottom: 1px solid var(--line);
+}
+h1 {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+h1 .accent { color: var(--accent); }
+.tagline { color: var(--ink-dim); font-size: 13px; margin-left: 12px; }
+#btn-theme {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  width: 34px; height: 34px;
+  font-size: 15px;
+  cursor: pointer;
+}
+#btn-theme:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- key selector ---------- */
+.key-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 0 6px;
+}
+.tonic-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.tonic-btn {
+  min-width: 42px;
+  padding: 7px 9px;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.tonic-btn:hover { border-color: var(--accent); }
+.tonic-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 650;
+}
+#mode-select {
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+#key-name { font-size: 14px; color: var(--ink-dim); margin-left: auto; }
+
+/* ---------- section titles ---------- */
+.section-title {
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  margin: 22px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.section-title .spacer { flex: 1; }
+
+/* ---------- chord cards ---------- */
+.card-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.chord-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 92px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+.chord-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--shadow);
+}
+.chord-card.played { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.card-roman { font-size: 19px; font-weight: 650; letter-spacing: -0.01em; }
+.card-symbol { font-size: 13px; color: var(--ink-dim); }
+.chord-card.suggestion { max-width: 235px; }
+.card-why { font-size: 12px; color: var(--ink-dim); margin-top: 5px; line-height: 1.35; }
+.chord-card.spicy .card-roman::after {
+  content: '◆';
+  font-size: 9px;
+  color: var(--accent);
+  vertical-align: super;
+  margin-left: 5px;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-weight: 500;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+.toggle input { accent-color: var(--accent); cursor: pointer; }
+#suggest-hint { text-transform: none; letter-spacing: 0; font-weight: 500; }
+
+/* ---------- instruments ---------- */
+.instrument {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+.fret-svg, .piano-svg { display: block; width: 100%; height: auto; }
+
+/* fretboard line-art */
+.fb-nut { stroke: var(--line-strong); stroke-width: 4; }
+.fb-fret { stroke: var(--line); stroke-width: 1.4; }
+.fb-string { stroke: var(--line-strong); stroke-width: 1.1; }
+.fb-label, .fb-marker-num {
+  fill: var(--ink-dim);
+  font-size: 10px;
+  font-family: inherit;
+  text-anchor: middle;
+}
+.fb-dot {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 1.8;
+}
+.fb-dot.root { fill: var(--accent); }
+
+/* piano line-art */
+.pk-white {
+  fill: var(--key-white);
+  stroke: var(--line-strong);
+  stroke-width: 1.1;
+  cursor: pointer;
+}
+.pk-black {
+  fill: var(--line-strong);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  cursor: pointer;
+}
+.pk-label { fill: var(--ink-dim); font-size: 9px; font-family: inherit; text-anchor: middle; pointer-events: none; }
+.pk-white.lit { fill: var(--accent-soft); stroke: var(--accent); }
+.pk-black.lit { fill: var(--accent); stroke: var(--accent); }
+
+/* playing pulse — soft animated opacity/scale on the lit note */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.45; }
+  100% { opacity: 1; }
+}
+.pulse { animation: pulse 0.9s ease-in-out infinite; }
+
+/* ---------- timeline (sticky bottom bar) ---------- */
+.timeline-bar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -6px 24px var(--shadow);
+  padding: 12px 0;
+  z-index: 10;
+}
+.timeline-inner {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+#timeline {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  overflow-x: auto;
+  padding: 3px 2px;
+  min-height: 46px;
+  align-items: center;
+}
+.timeline-empty { color: var(--ink-dim); font-size: 13px; }
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: grab;
+  user-select: none;
+  white-space: nowrap;
+  transition: border-color 0.15s;
+}
+.chip:hover { border-color: var(--accent); }
+.chip:hover .chip-x { opacity: 1; }
+.chip-roman { font-weight: 650; font-size: 15px; }
+.chip-symbol { font-size: 12px; color: var(--ink-dim); }
+.chip-x { font-size: 12px; color: var(--accent); opacity: 0; transition: opacity 0.15s; }
+.chip.dragging { opacity: 0.4; }
+.chip.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.chip.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  animation: pulse 0.9s ease-in-out infinite;
+}
+
+.transport { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.transport button {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.transport button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.transport button:disabled { opacity: 0.4; cursor: default; }
+#btn-play.playing { border-color: var(--accent); color: var(--accent); }
+.bpm-field { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-dim); }
+#bpm {
+  width: 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 8px;
+}
+
+footer.credits {
+  color: var(--ink-dim);
+  font-size: 12px;
+  padding: 26px 0 10px;
+}
+
+@media (max-width: 760px) {
+  .timeline-inner { flex-direction: column; align-items: stretch; }
+  #key-name { display: none; }
+  body { padding-bottom: 190px; }
+}
