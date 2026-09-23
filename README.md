@@ -1,5 +1,7 @@
 # Chordfolio — chord progression explorer
 
+**[Live demo](https://felimart2003.github.io/midi-chord-progression-explorer/)** · [Source](https://github.com/felimart2003/midi-chord-progression-explorer)
+
 A zero-signup web tool for exploring chord progressions: pick a key, click
 diatonic chords to hear them and build a progression, get harmonically sensible
 "next chord" suggestions, loop the result with a metronome, and export it as a
@@ -99,3 +101,13 @@ Playback uses a look-ahead scheduler: a 40 ms interval schedules chords ~180 ms
 ahead on the AudioContext clock, so looping stays sample-accurate regardless of
 UI jank; DOM highlights are synced separately with `setTimeout` against the
 audio clock.
+
+## Persistence and accessibility
+
+Progressions, key, mode, and tempo save automatically in this browser. Up to 64 chords can be arranged. Invalid saved state is ignored safely. Timeline chips are keyboard buttons: Enter removes a chord, Alt + Left/Right moves it. Focus rings and reduced-motion preferences are supported. Stop cancels sounding and scheduled voices; playback also stops when the page is hidden.
+
+## Deployment
+
+GitHub Actions runs the musical logic regression suite and deploys only `index.html`, `css/`, and `js/` to **GitHub Pages**. No API keys, dependencies, or environment variables are required. Push to `main` to redeploy.
+
+The app uses Web Audio synthesis, SVG instrument views, a hand-written Standard MIDI File encoder, and key-relative chord descriptors. Audio requires a user gesture. MIDI export is a file download, not a connection to physical MIDI hardware. Browser storage is local to this device.

@@ -310,3 +310,9 @@ footer.credits {
   #key-name { display: none; }
   body { padding-bottom: 190px; }
 }
+
+/* Keyboard and small-screen accessibility. */
+.chip { color: var(--ink); font: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.transport { flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

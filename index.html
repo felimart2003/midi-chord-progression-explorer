@@ -13,7 +13,7 @@
       <div>
         <h1>Chord<span class="accent">folio</span><span class="tagline">progression explorer · MIDI out</span></h1>
       </div>
-      <button id="btn-theme" title="Toggle light/dark">☀</button>
+      <button id="btn-theme" title="Toggle light/dark" aria-label="Toggle light and dark theme">☀</button>
     </header>
 
     <section class="key-bar" aria-label="Key selector">
@@ -40,6 +40,7 @@
     <div class="instrument" id="piano"></div>
 
     <footer class="credits">
+      <p id="status" role="status">Your progression saves automatically on this device. Timeline: click to remove, Alt + arrow keys to reorder.</p>
       Built with the Web Audio API — no accounts, no tracking. Space bar toggles playback.
     </footer>
   </div>

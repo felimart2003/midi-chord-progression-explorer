@@ -15,6 +15,24 @@
     playing: false,
   };
 
+  const STORAGE_KEY = 'chordfolio-workspace-v1';
+  function persist() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ tonicPc: state.tonicPc, modeId: state.modeId, progression: state.progression, bpm: state.bpm })); }
+    catch { $('#status').textContent = 'Browser storage unavailable. Export MIDI to keep your work.'; }
+  }
+  function restore() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (!saved) return;
+      if (Number.isInteger(saved.tonicPc) && saved.tonicPc >= 0 && saved.tonicPc < 12) state.tonicPc = saved.tonicPc;
+      if (Object.hasOwn(Theory.MODES, saved.modeId)) state.modeId = saved.modeId;
+      if (Number.isFinite(saved.bpm)) state.bpm = Math.max(40, Math.min(220, saved.bpm));
+      if (Array.isArray(saved.progression)) state.progression = saved.progression.filter(d =>
+        d && Number.isInteger(d.rootOffset) && d.rootOffset >= 0 && d.rootOffset < 12 &&
+        Object.hasOwn(Theory.QUALITIES, d.quality)).slice(0, 64);
+    } catch { /* Invalid saved state should never prevent startup. */ }
+  }
+
   let piano, fretboard;
   let selectedChord = null;
   let selectTimer = null;
@@ -48,6 +66,7 @@
       const b = document.createElement('button');
       b.className = 'tonic-btn' + (pc === state.tonicPc ? ' active' : '');
       b.textContent = Theory.tonicNameFor(pc, state.modeId);
+      b.setAttribute('aria-pressed', String(pc === state.tonicPc));
       b.addEventListener('click', () => { state.tonicPc = pc; setKey(); });
       row.appendChild(b);
     }
@@ -72,9 +91,10 @@
   }
 
   function setKey() {
+    stopPlayback();
     state.key = Theory.getKey(state.tonicPc, state.modeId);
     document.querySelectorAll('.tonic-btn').forEach((b, i) =>
-      b.classList.toggle('active', i === state.tonicPc));
+      { b.classList.toggle('active', i === state.tonicPc); b.setAttribute('aria-pressed', String(i === state.tonicPc)); });
     $('#key-name').textContent = state.key.name;
     selectedChord = null;
     piano.clear();
@@ -132,6 +152,7 @@
     state.progression.map(d => Theory.chordFromDescriptor(state.key, d));
 
   function addToProgression(chord) {
+    if (state.progression.length >= 64) { $('#status').textContent = 'Maximum 64 chords. Remove a chord to add another.'; return; }
     state.progression.push({ rootOffset: chord.rootOffset, quality: chord.quality });
     renderTimeline();
     renderSuggestions();
@@ -155,6 +176,7 @@
   let dragIx = null;
 
   function renderTimeline() {
+    persist();
     const row = $('#timeline');
     row.innerHTML = '';
     const chords = currentChords();
@@ -165,7 +187,17 @@
       row.appendChild(empty);
     }
     chords.forEach((chord, ix) => {
-      const chip = document.createElement('div');
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.setAttribute('aria-label', `${chord.symbol}: remove. Alt and arrow keys reorder.`);
+      chip.addEventListener('keydown', e => {
+        if (e.altKey && ['ArrowLeft', 'ArrowRight'].includes(e.key)) {
+          e.preventDefault();
+          const to = Math.max(0, Math.min(state.progression.length - 1, ix + (e.key === 'ArrowLeft' ? -1 : 1)));
+          moveChip(ix, to);
+          $('#timeline').children[to]?.focus();
+        }
+      });
       chip.className = 'chip';
       chip.draggable = true;
       chip.dataset.ix = ix;
@@ -201,7 +233,7 @@
   }
 
   // ---------- playback (lookahead scheduler, loops the progression) ------------
-  let schedTimer = null, nextTime = 0, stepIx = 0;
+  let schedTimer = null, nextTime = 0, stepIx = 0, playbackVersion = 0;
 
   function schedule() {
     if (!state.progression.length) { stopPlayback(); return; }
@@ -215,8 +247,9 @@
         for (let b = 0; b < BEATS_PER_CHORD; b++)
           Synth.click(nextTime + b * secPerBeat, b === 0 && ix === 0);
       const at = nextTime;
+      const version = playbackVersion;
       setTimeout(() => {
-        if (!state.playing) return;
+        if (!state.playing || version !== playbackVersion) return;
         setActiveChip(ix);
         showChord(chord, true);
       }, Math.max(0, (at - Synth.now()) * 1000));
@@ -240,6 +273,8 @@
   function stopPlayback() {
     if (!state.playing && !schedTimer) return;
     state.playing = false;
+    playbackVersion++;
+    Synth.stopAll();
     clearInterval(schedTimer);
     schedTimer = null;
     setActiveChip(-1);
@@ -272,6 +307,7 @@
 
   // ---------- init -----------------------------------------------------------------
   function init() {
+    restore();
     let theme = 'dark';
     try { theme = localStorage.getItem('mcpe-theme') || 'dark'; } catch (e) { /* ignore */ }
     setTheme(theme);
@@ -300,6 +336,7 @@
     bpm.addEventListener('change', () => {
       state.bpm = Math.min(220, Math.max(40, +bpm.value || 100));
       bpm.value = state.bpm;
+      persist();
     });
     $('#metronome').checked = state.metronome;
     $('#metronome').addEventListener('change', e => { state.metronome = e.target.checked; });
@@ -308,8 +345,9 @@
       renderSuggestions();
     });
 
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopPlayback(); });
     document.addEventListener('keydown', e => {
-      if (e.code === 'Space' && !/INPUT|SELECT|BUTTON/.test(e.target.tagName)) {
+      if (e.code === 'Space' && !/INPUT|SELECT|BUTTON|TEXTAREA/.test(e.target.tagName) && !e.target.isContentEditable) {
         e.preventDefault();
         state.playing ? stopPlayback() : startPlayback();
       }

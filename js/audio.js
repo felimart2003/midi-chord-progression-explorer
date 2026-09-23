@@ -5,6 +5,9 @@
 const Synth = (() => {
   let ctx = null;
   let master = null;
+  const active = new Set();
+  const track = o => { active.add(o); o.addEventListener('ended', () => { active.delete(o); o.disconnect(); }); };
+  function stopAll() { for (const o of active) { try { o.stop(); } catch {} } active.clear(); }
 
   function ensureCtx() {
     if (!ctx) {
@@ -56,6 +59,7 @@ const Synth = (() => {
       g.gain.value = gain;
       o.connect(g);
       g.connect(amp);
+      track(o);
       o.start(t);
       o.stop(end + 0.8);
       voices.push(o);
@@ -93,6 +97,7 @@ const Synth = (() => {
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
     o.connect(g);
     g.connect(master);
+    track(o);
     o.start(t);
     o.stop(t + 0.06);
   }
@@ -103,5 +108,6 @@ const Synth = (() => {
     click,
     now: () => ensureCtx().currentTime,
     ensure: ensureCtx,
+    stopAll,
   };
 })();
