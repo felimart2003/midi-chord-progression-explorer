@@ -111,3 +111,6 @@ Progressions, key, mode, and tempo save automatically in this browser. Up to 64 
 GitHub Actions runs the musical logic regression suite and deploys only `index.html`, `css/`, and `js/` to **GitHub Pages**. No API keys, dependencies, or environment variables are required. Push to `main` to redeploy.
 
 The app uses Web Audio synthesis, SVG instrument views, a hand-written Standard MIDI File encoder, and key-relative chord descriptors. Audio requires a user gesture. MIDI export is a file download, not a connection to physical MIDI hardware. Browser storage is local to this device.
+
+![Chordfolio progression editor](docs/demo.png)
+
